@@ -82,4 +82,5 @@ void loop() {
         stopRightMoto();
         state = STATE_STOP;
     }
+    delay(60); // 大于 60 ms 防止超声波信号干扰
 }
