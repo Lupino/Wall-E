@@ -69,14 +69,18 @@ void setup() {
 
 void loop() {
     int distance = getDistance();
-    if (distance < 10 && state != STATE_MOVE_FORWORD) {
-        startLeftMoto(MOVE_BACKWORD);
-        startRightMoto(MOVE_BACKWORD);
-        state = STATE_MOVE_FORWORD;
-    } else if (distance > 15 && distance < 50 && state != STATE_MOVE_BACKWORD) {
-        startLeftMoto(MOVE_FORWORD);
-        startRightMoto(MOVE_FORWORD);
-        state = STATE_MOVE_BACKWORD;
+    if (distance < 15) {
+        if (state != STATE_MOVE_BACKWORD) {
+            startLeftMoto(MOVE_BACKWORD);
+            startRightMoto(MOVE_BACKWORD);
+            state = STATE_MOVE_BACKWORD;
+        }
+    } else if (distance > 20 && distance < 40) {
+        if (state != STATE_MOVE_FORWORD) {
+            startLeftMoto(MOVE_FORWORD);
+            startRightMoto(MOVE_FORWORD);
+            state = STATE_MOVE_FORWORD;
+        }
     } else if (state != STATE_STOP) {
         stopLeftMoto();
         stopRightMoto();
