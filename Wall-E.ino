@@ -83,12 +83,12 @@ int getDistance() {
 
 void move(int pos) {
     if (currentPos > pos) {
-        for (currentPos >= pos; currentPos -= 1) {
+        for (;currentPos >= pos; currentPos -= 1) {
             myservo.write(currentPos);
             delay(15);
         }
     } else {
-        for (currentPos <= pos; currentPos += 1) {
+        for (;currentPos <= pos; currentPos += 1) {
             myservo.write(currentPos);
             delay(15);
         }
@@ -118,7 +118,7 @@ void loop() {
     }
 
     move(middleSide);
-    int distance = getDistance();
+    distance = getDistance();
     if (distance < 15) {
         startLeftMoto(MOVE_BACKWORD);
         startRightMoto(MOVE_BACKWORD);
@@ -131,7 +131,7 @@ void loop() {
     }
 
     move(rightSide);
-    int distance = getDistance();
+    distance = getDistance();
     if (distance < 15) {
         startLeftMoto(MOVE_BACKWORD);
         stopRightMoto();
