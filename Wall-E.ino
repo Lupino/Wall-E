@@ -107,57 +107,63 @@ void setup() {
     Serial.begin(9600);
 }
 
-void processLeftSide() {
-    move(leftSide);
-    int distance = getDistance();
-    Serial.print(leftSide);
-    Serial.print(" ");
-    Serial.println(distance);
-    if (distance < 15) {
-        stopLeftMoto();
-        startRightMoto(MOVE_BACKWORD);
-    } else if (distance > 20 && distance < 40) {
-            stopLeftMoto();
-            startRightMoto(MOVE_FORWORD);
-    }
-}
-
-void processMiddleSide() {
+void loop() {
     move(middleSide);
     int distance = getDistance();
-    Serial.print(middleSide);
-    Serial.print(" ");
-    Serial.println(distance);
+    move(leftSide);
+    int leftDistance = getDistance();
+    move(middleSide);
+    int middleDistance = getDistance();
+    move(rightSide);
+    int rightDistance = getDistance();
+
+    Serial.print(distance);
+    Serial.print(", ");
+    Serial.print(leftDistance);
+    Serial.print(", ");
+    Serial.print(rightDistance);
+    Serial.print(", ");
+    Serial.println(middleDistance);
+
+    bool needStopLeft = false;
+    bool needStopRight = false
+    if (distance > middleDistance) { //  机器前进
+        if (leftDistance < distance && distance < rightDistance) {
+            needStopLeft = true;
+        } else if (rightDistance < distance && distance < leftDistance) {
+            needStopRight = true;
+        }
+    } else if (middleDistance > distance){ // 机器后退
+        if (leftDistance < distance && distance < rightDistance) {
+            needStopRight = true;
+        } else if (rightDistance < distance && distance < leftDistance) {
+            needStopLeft = true;
+        }
+    }
     if (distance < 15) {
-        startLeftMoto(MOVE_BACKWORD);
-        startRightMoto(MOVE_BACKWORD);
+        if (needStopLeft) {
+            stopLeftMoto();
+        } else {
+            startLeftMoto(MOVE_BACKWORD);
+        }
+        if (needStopRight) {
+            stopRightMoto();
+        } else {
+            startRightMoto(MOVE_BACKWORD);
+        }
     } else if (distance > 20 && distance < 40) {
-        startLeftMoto(MOVE_FORWORD);
-        startRightMoto(MOVE_FORWORD);
+        if (needStopLeft) {
+            stopLeftMoto();
+        } else {
+            startLeftMoto(MOVE_FORWORD);
+        }
+        if (needStopRight) {
+            stopRightMoto();
+        } else {
+            startRightMoto(MOVE_FORWORD);
+        }
     } else {
         stopLeftMoto();
         stopRightMoto();
     }
-}
-
-void processRightSide() {
-    move(rightSide);
-    int distance = getDistance();
-    Serial.print(rightSide);
-    Serial.print(" ");
-    Serial.println(distance);
-    if (distance < 15) {
-        startLeftMoto(MOVE_BACKWORD);
-        stopRightMoto();
-    } else if (distance > 20 && distance < 40) {
-        startLeftMoto(MOVE_FORWORD);
-        stopRightMoto();
-    }
-}
-
-void loop() {
-    processMiddleSide();
-    processRightSide();
-    processMiddleSide();
-    processLeftSide();
 }
