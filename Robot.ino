@@ -1,3 +1,5 @@
+#include <Servo.h>
+
 const int motoPin1 = 9;
 const int motoPin2 = 10;
 const int motoPin3 = 11;
@@ -6,14 +8,24 @@ const int motoPin4 = 12;
 const int echoPin = 4;
 const int trigPin = 5;
 
+const int servoPin = 6;
+
+const int leftSide = 75;
+const int middleSide = 90;
+const int rightSide = 105;
+int currentPos = 90;
+
 const bool MOVE_FORWORD = true;
 const bool MOVE_BACKWORD = false;
 
-int state = 0;
+int leftMotoState = 0;
+int rightMotoState = 0;
 
 const int STATE_MOVE_FORWORD = 1;
 const int STATE_MOVE_BACKWORD = 2;
 const int STATE_STOP = 3;
+
+Servo myservo;
 
 void startMoto(int pin1, int pin2, bool forward) {
     if (forward == MOVE_BACKWORD) {
@@ -26,11 +38,17 @@ void startMoto(int pin1, int pin2, bool forward) {
 }
 
 void startLeftMoto(bool forword) {
-    startMoto(motoPin1, motoPin2, forword);
+    if (leftMotoState != forword) {
+        startMoto(motoPin1, motoPin2, forword);
+        leftMotoState = forword;
+    }
 }
 
 void startRightMoto(bool forword) {
-    startMoto(motoPin3, motoPin4, forword);
+    if (rightMotoState != forword) {
+        startMoto(motoPin3, motoPin4, forword);
+        rightMotoState = forword;
+    }
 }
 
 void stopMoto(int pin1, int pin2) {
@@ -39,11 +57,17 @@ void stopMoto(int pin1, int pin2) {
 }
 
 void stopLeftMoto() {
-    stopMoto(motoPin1, motoPin2);
+    if (leftMotoState != STATE_STOP) {
+        stopMoto(motoPin1, motoPin2);
+        leftMotoState = STATE_STOP;
+    }
 }
 
 void stopRightMoto() {
-    stopMoto(motoPin3, motoPin4);
+    if (rightMotoState != STATE_STOP) {
+        stopMoto(motoPin3, motoPin4);
+        rightMotoState = STATE_STOP;
+    }
 }
 
 int getDistance() {
@@ -57,6 +81,20 @@ int getDistance() {
     return distance;
 }
 
+void move(int pos) {
+    if (currentPos > pos) {
+        for (currentPos >= pos; currentPos -= 1) {
+            myservo.write(currentPos);
+            delay(15);
+        }
+    } else {
+        for (currentPos <= pos; currentPos += 1) {
+            myservo.write(currentPos);
+            delay(15);
+        }
+    }
+}
+
 void setup() {
     pinMode(motoPin1, OUTPUT);
     pinMode(motoPin2, OUTPUT);
@@ -64,27 +102,41 @@ void setup() {
     pinMode(motoPin4, OUTPUT);
     pinMode(echoPin, INPUT);
     pinMode(trigPin, OUTPUT);
-    // startLeftMoto(true);
+    myservo.attach(servoPin);
+    myservo.write(currentPos);
 }
 
 void loop() {
+    move(leftSide);
     int distance = getDistance();
     if (distance < 15) {
-        if (state != STATE_MOVE_BACKWORD) {
-            startLeftMoto(MOVE_BACKWORD);
-            startRightMoto(MOVE_BACKWORD);
-            state = STATE_MOVE_BACKWORD;
-        }
+        stopLeftMoto();
+        startRightMoto(MOVE_BACKWORD);
     } else if (distance > 20 && distance < 40) {
-        if (state != STATE_MOVE_FORWORD) {
-            startLeftMoto(MOVE_FORWORD);
+            stopLeftMoto();
             startRightMoto(MOVE_FORWORD);
-            state = STATE_MOVE_FORWORD;
-        }
-    } else if (state != STATE_STOP) {
+    }
+
+    move(middleSide);
+    int distance = getDistance();
+    if (distance < 15) {
+        startLeftMoto(MOVE_BACKWORD);
+        startRightMoto(MOVE_BACKWORD);
+    } else if (distance > 20 && distance < 40) {
+        startLeftMoto(MOVE_FORWORD);
+        startRightMoto(MOVE_FORWORD);
+    } else {
         stopLeftMoto();
         stopRightMoto();
-        state = STATE_STOP;
     }
-    delay(60); // 大于 60 ms 防止超声波信号干扰
+
+    move(rightSide);
+    int distance = getDistance();
+    if (distance < 15) {
+        startLeftMoto(MOVE_BACKWORD);
+        stopRightMoto();
+    } else if (distance > 20 && distance < 40) {
+        startLeftMoto(MOVE_FORWORD);
+        stopRightMoto();
+    }
 }
