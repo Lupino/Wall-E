@@ -106,7 +106,7 @@ void setup() {
     myservo.write(currentPos);
 }
 
-void loop() {
+void processLeftSide() {
     move(leftSide);
     int distance = getDistance();
     if (distance < 15) {
@@ -116,9 +116,11 @@ void loop() {
             stopLeftMoto();
             startRightMoto(MOVE_FORWORD);
     }
+}
 
+void processMiddleSide() {
     move(middleSide);
-    distance = getDistance();
+    int distance = getDistance();
     if (distance < 15) {
         startLeftMoto(MOVE_BACKWORD);
         startRightMoto(MOVE_BACKWORD);
@@ -129,9 +131,11 @@ void loop() {
         stopLeftMoto();
         stopRightMoto();
     }
+}
 
+void processRightSide() {
     move(rightSide);
-    distance = getDistance();
+    int distance = getDistance();
     if (distance < 15) {
         startLeftMoto(MOVE_BACKWORD);
         stopRightMoto();
@@ -139,4 +143,11 @@ void loop() {
         startLeftMoto(MOVE_FORWORD);
         stopRightMoto();
     }
+}
+
+void loop() {
+    processMiddleSide();
+    processRightSide();
+    processMiddleSide();
+    processLeftSide();
 }
