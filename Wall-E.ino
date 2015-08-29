@@ -104,11 +104,15 @@ void setup() {
     pinMode(trigPin, OUTPUT);
     myservo.attach(servoPin);
     myservo.write(currentPos);
+    Serial.begin(9600);
 }
 
 void processLeftSide() {
     move(leftSide);
     int distance = getDistance();
+    Serial.print(leftSide);
+    Serial.print(" ");
+    Serial.println(distance);
     if (distance < 15) {
         stopLeftMoto();
         startRightMoto(MOVE_BACKWORD);
@@ -121,6 +125,9 @@ void processLeftSide() {
 void processMiddleSide() {
     move(middleSide);
     int distance = getDistance();
+    Serial.print(middleSide);
+    Serial.print(" ");
+    Serial.println(distance);
     if (distance < 15) {
         startLeftMoto(MOVE_BACKWORD);
         startRightMoto(MOVE_BACKWORD);
@@ -136,6 +143,9 @@ void processMiddleSide() {
 void processRightSide() {
     move(rightSide);
     int distance = getDistance();
+    Serial.print(rightSide);
+    Serial.print(" ");
+    Serial.println(distance);
     if (distance < 15) {
         startLeftMoto(MOVE_BACKWORD);
         stopRightMoto();
